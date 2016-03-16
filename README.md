@@ -1,7 +1,7 @@
 # _`is_wds_admin`_ #
-**Contributors:**      WebDevStudios, jazzsequence
-**Stable tag:**        1.0.0
-**License:**           GPLv2
+**Contributors:**      WebDevStudios, jazzsequence  
+**Stable tag:**        1.0.0  
+**License:**           GPLv2  
 **License URI:**       http://www.gnu.org/licenses/gpl-2.0.html
 
 ## Description ##
