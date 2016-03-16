@@ -55,6 +55,14 @@ class Is_WDS_Admin {
 	protected $basename = '';
 
 	/**
+	 * Priveleged username
+	 *
+	 * @var string
+	 * @since  NEXT
+	 */
+	protected $priveleged_user = '';
+
+	/**
 	 * Singleton instance of plugin
 	 *
 	 * @var Is_WDS_Admin
