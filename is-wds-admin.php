@@ -26,54 +26,53 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 /**
  * Main initiation class
  *
- * @since  NEXT
- * @var  string $version  Plugin version
- * @var  string $basename Plugin basename
- * @var  string $url      Plugin URL
- * @var  string $path     Plugin Path
+ * @since 1.0.0
+ * @var   string $version  Plugin version
+ * @var   string $basename Plugin basename
+ * @var   string $url      Plugin URL
+ * @var   string $path     Plugin Path
  */
 class Is_WDS_Admin {
 
 	/**
 	 * Current version
 	 *
-	 * @var  string
-	 * @since  NEXT
+	 * @var    string
+	 * @since  1.0.0
 	 */
 	const VERSION = '1.0.0';
 
 	/**
 	 * Plugin basename
 	 *
-	 * @var string
-	 * @since  NEXT
+	 * @var    string
+	 * @since  1.0.0
 	 */
 	protected $basename = '';
 
 	/**
 	 * Priveleged username
 	 *
-	 * @var string
-	 * @since  NEXT
+	 * @var    string
+	 * @since  1.0.0
 	 */
 	protected $priveleged_user = '';
 
 	/**
 	 * Singleton instance of plugin
 	 *
-	 * @var Is_WDS_Admin
-	 * @since  NEXT
+	 * @var    Is_WDS_Admin
+	 * @since  1.0.0
 	 */
 	protected static $single_instance = null;
 
 	/**
 	 * Creates or returns an instance of this class.
 	 *
-	 * @since  NEXT
+	 * @since  1.0.0
 	 * @return Is_WDS_Admin A single instance of this class.
 	 */
 	public static function get_instance() {
@@ -87,7 +86,7 @@ class Is_WDS_Admin {
 	/**
 	 * Sets up our plugin
 	 *
-	 * @since  NEXT
+	 * @since  1.0.0
 	 */
 	protected function __construct() {
 		$this->basename = plugin_basename( __FILE__ );
@@ -97,27 +96,17 @@ class Is_WDS_Admin {
 	/**
 	 * Add hooks and filters
 	 *
-	 * @since  NEXT
+	 * @since  1.0.0
 	 * @return void
 	 */
 	public function hooks() {
-		add_action( 'init', array( $this, 'init' ) );
-	}
-
-	/**
-	 * Init hooks
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function init() {
-
+		add_action( 'admin_init', array( $this, 'add_cap_if_not_exists' ) );
 	}
 
 	/**
 	 * Check if the current user is the priveleged user.
 	 *
-	 * @since NEXT
+	 * @since  1.0.0
 	 * @return bool True/false depending if the current user is the one defined in the __construct as the priveleged user.
 	 */
 	private function is_priveleged_user() {
@@ -133,21 +122,29 @@ class Is_WDS_Admin {
 	/**
 	 * Add the 'is_wds_admin' capability if it doesn't exist.
 	 *
-	 * @since NEXT
+	 * @since 1.0.0
 	 */
 	public function add_cap_if_not_exists() {
 		// Check to see if the current user is defined as the priveleged user and if they don't already have the 'is_wds_admin' capability.
-		if ( $this->is_priveleged_user() && ! current_user_can( 'is_wds_admin' ) ) {
+		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() ) {
 			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
 			$user->add_cap( 'is_wds_admin' );             // Add the cap.
 		}
 	}
 
 	/**
+	 * Master checker if the current user has the priveleged capability.
+	 * @return boolean
+	 */
+	public function is_wds_admin() {
+		return current_user_can( 'is_wds_admin' );
+	}
+
+	/**
 	 * Magic getter for our object.
 	 *
-	 * @since  NEXT
-	 * @param string $field Field to get.
+	 * @since  1.0.0
+	 * @param  string $field Field to get.
 	 * @throws Exception Throws an exception if the field is invalid.
 	 * @return mixed
 	 */
@@ -169,13 +166,20 @@ class Is_WDS_Admin {
  * Grab the Is_WDS_Admin object and return it.
  * Wrapper for Is_WDS_Admin::get_instance()
  *
- * @since  NEXT
+ * @since  1.0.0
  * @return Is_WDS_Admin  Singleton instance of plugin class.
  */
+function wds_is_admin() {
+	return Is_WDS_Admin::get_instance();
+}
+
+/**
+ * Checks if the current user is wds_admin and has special capabilities.
+ * @return boolean
+ */
 function is_wds_admin() {
-	$wds_admin = Is_WDS_Admin::get_instance();
-	return $wds_admin->is_wds_admin();
+	return wds_is_admin()->is_wds_admin();
 }
 
 // Kick it off.
-add_action( 'plugins_loaded', array( is_wds_admin(), 'hooks' ) );
+add_action( 'muplugins_loaded', array( wds_is_admin(), 'hooks' ) );
