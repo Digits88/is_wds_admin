@@ -91,6 +91,7 @@ class Is_WDS_Admin {
 	 */
 	protected function __construct() {
 		$this->basename = plugin_basename( __FILE__ );
+		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
 	}
 
 	/**
