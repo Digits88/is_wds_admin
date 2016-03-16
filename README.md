@@ -1,4 +1,4 @@
-# is_wds_admin #
+# `is_wds_admin` #
 **Contributors:**      WebDevStudios, jazzsequence
 **Stable tag:**        1.0.0
 **License:**           GPLv2
