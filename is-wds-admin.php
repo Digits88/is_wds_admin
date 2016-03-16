@@ -1,15 +1,11 @@
 <?php
 /**
  * Plugin Name: is_wds_admin
- * Plugin URI:  http://webdevstudios.com
- * Description: Adds a custom capability and some helper functions to determine if the current user is a privileged WDS user.
+ * Description: Adds a custom capability and some helper functions to determine if the current user is a privileged WDS user. NOT TO BE INSTALLED AS A NORMAL PLUGIN.
  * Version:     1.0.0
  * Author:      WebDevStudios
  * Author URI:  http://webdevstudios.com
- * Donate link: http://webdevstudios.com
  * License:     GPLv2
- * Text Domain: is-wds-admin
- * Domain Path: /languages
  */
 
 /**
@@ -30,32 +26,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/**
- * Built using generator-plugin-wp
- */
-
-
-/**
- * Autoloads files with classes when needed
- *
- * @since  NEXT
- * @param  string $class_name Name of the class being requested.
- * @return void
- */
-function is_wds_admin_autoload_classes( $class_name ) {
-	if ( 0 !== strpos( $class_name, 'IWDSA_' ) ) {
-		return;
-	}
-
-	$filename = strtolower( str_replace(
-		'_', '-',
-		substr( $class_name, strlen( 'IWDSA_' ) )
-	) );
-
-	Is_WDS_Admin::include_file( $filename );
-}
-spl_autoload_register( 'is_wds_admin_autoload_classes' );
-
 
 /**
  * Main initiation class
@@ -75,22 +45,6 @@ class Is_WDS_Admin {
 	 * @since  NEXT
 	 */
 	const VERSION = '1.0.0';
-
-	/**
-	 * URL of plugin directory
-	 *
-	 * @var string
-	 * @since  NEXT
-	 */
-	protected $url = '';
-
-	/**
-	 * Path of plugin directory
-	 *
-	 * @var string
-	 * @since  NEXT
-	 */
-	protected $path = '';
 
 	/**
 	 * Plugin basename
@@ -129,22 +83,7 @@ class Is_WDS_Admin {
 	 */
 	protected function __construct() {
 		$this->basename = plugin_basename( __FILE__ );
-		$this->url      = plugin_dir_url( __FILE__ );
-		$this->path     = plugin_dir_path( __FILE__ );
-
-		$this->plugin_classes();
 	}
-
-	/**
-	 * Attach other plugin classes to the base plugin class.
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function plugin_classes() {
-		// Attach other plugin classes to the base plugin class.
-		// $this->plugin_class = new IWDSA_Plugin_Class( $this );
-	} // END OF PLUGIN CLASSES FUNCTION
 
 	/**
 	 * Add hooks and filters
@@ -153,29 +92,8 @@ class Is_WDS_Admin {
 	 * @return void
 	 */
 	public function hooks() {
-
 		add_action( 'init', array( $this, 'init' ) );
 	}
-
-	/**
-	 * Activate the plugin
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function _activate() {
-		// Make sure any rewrite functionality has been loaded.
-		flush_rewrite_rules();
-	}
-
-	/**
-	 * Deactivate the plugin
-	 * Uninstall routines should be in uninstall.php
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function _deactivate() {}
 
 	/**
 	 * Init hooks
@@ -184,67 +102,6 @@ class Is_WDS_Admin {
 	 * @return void
 	 */
 	public function init() {
-		if ( $this->check_requirements() ) {
-			load_plugin_textdomain( 'is-wds-admin', false, dirname( $this->basename ) . '/languages/' );
-		}
-	}
-
-	/**
-	 * Check if the plugin meets requirements and
-	 * disable it if they are not present.
-	 *
-	 * @since  NEXT
-	 * @return boolean result of meets_requirements
-	 */
-	public function check_requirements() {
-		if ( ! $this->meets_requirements() ) {
-
-			// Add a dashboard notice.
-			add_action( 'all_admin_notices', array( $this, 'requirements_not_met_notice' ) );
-
-			// Deactivate our plugin.
-			add_action( 'admin_init', array( $this, 'deactivate_me' ) );
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Deactivates this plugin, hook this function on admin_init.
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function deactivate_me() {
-		deactivate_plugins( $this->basename );
-	}
-
-	/**
-	 * Check that all plugin requirements are met
-	 *
-	 * @since  NEXT
-	 * @return boolean True if requirements are met.
-	 */
-	public static function meets_requirements() {
-		// Do checks for required classes / functions
-		// function_exists('') & class_exists('').
-		// We have met all requirements.
-		return true;
-	}
-
-	/**
-	 * Adds a notice to the dashboard if the plugin requirements are not met
-	 *
-	 * @since  NEXT
-	 * @return void
-	 */
-	public function requirements_not_met_notice() {
-		// Output our error.
-		echo '<div id="message" class="error">';
-		echo '<p>' . sprintf( __( 'is_wds_admin is missing requirements and has been <a href="%s">deactivated</a>. Please make sure all requirements are available.', 'is-wds-admin' ), admin_url( 'plugins.php' ) ) . '</p>';
-		echo '</div>';
 	}
 
 	/**
@@ -267,47 +124,6 @@ class Is_WDS_Admin {
 				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
 		}
 	}
-
-	/**
-	 * Include a file from the includes directory
-	 *
-	 * @since  NEXT
-	 * @param  string $filename Name of the file to be included.
-	 * @return bool   Result of include call.
-	 */
-	public static function include_file( $filename ) {
-		$file = self::dir( 'includes/class-'. $filename .'.php' );
-		if ( file_exists( $file ) ) {
-			return include_once( $file );
-		}
-		return false;
-	}
-
-	/**
-	 * This plugin's directory
-	 *
-	 * @since  NEXT
-	 * @param  string $path (optional) appended path.
-	 * @return string       Directory and path
-	 */
-	public static function dir( $path = '' ) {
-		static $dir;
-		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
-		return $dir . $path;
-	}
-
-	/**
-	 * This plugin's url
-	 *
-	 * @since  NEXT
-	 * @param  string $path (optional) appended path.
-	 * @return string       URL and path
-	 */
-	public static function url( $path = '' ) {
-		static $url;
-		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
-		return $url . $path;
-	}
 }
 
 /**
@@ -318,11 +134,9 @@ class Is_WDS_Admin {
  * @return Is_WDS_Admin  Singleton instance of plugin class.
  */
 function is_wds_admin() {
-	return Is_WDS_Admin::get_instance();
+	$wds_admin = Is_WDS_Admin::get_instance();
+	return $wds_admin->is_wds_admin();
 }
 
 // Kick it off.
 add_action( 'plugins_loaded', array( is_wds_admin(), 'hooks' ) );
-
-register_activation_hook( __FILE__, array( is_wds_admin(), '_activate' ) );
-register_deactivation_hook( __FILE__, array( is_wds_admin(), '_deactivate' ) );
