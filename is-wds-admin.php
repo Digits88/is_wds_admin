@@ -131,6 +131,19 @@ class Is_WDS_Admin {
 	}
 
 	/**
+	 * Add the 'is_wds_admin' capability if it doesn't exist.
+	 *
+	 * @since NEXT
+	 */
+	public function add_cap_if_not_exists() {
+		// Check to see if the current user is defined as the priveleged user and if they don't already have the 'is_wds_admin' capability.
+		if ( $this->is_priveleged_user() && ! current_user_can( 'is_wds_admin' ) ) {
+			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
+			$user->add_cap( 'is_wds_admin' );             // Add the cap.
+		}
+	}
+
+	/**
 	 * Magic getter for our object.
 	 *
 	 * @since  NEXT
