@@ -16,16 +16,7 @@ Adds a custom capability and some helper functions to determine if the current u
 
 ## Frequently Asked Questions ##
 
-
-## Screenshots ##
-
-
 ## Changelog ##
 
 ### 1.0.0 ###
 * First release
-
-## Upgrade Notice ##
-
-### 1.0.0 ###
-First Release
