@@ -10,11 +10,7 @@ Adds a custom capability and some helper functions to determine if the current u
 
 ## Installation ##
 
-### Manual Installation ###
-
-1. Upload the `is-wds-admin.php` file to the `/wp-content/mu-plugins/` directory.
-
-## Frequently Asked Questions ##
+Upload the `is-wds-admin.php` file to the `/wp-content/mu-plugins/` directory.
 
 ## Changelog ##
 
