@@ -111,6 +111,23 @@ class Is_WDS_Admin {
 	 * @return void
 	 */
 	public function init() {
+
+	}
+
+	/**
+	 * Check if the current user is the priveleged user.
+	 *
+	 * @since NEXT
+	 * @return bool True/false depending if the current user is the one defined in the __construct as the priveleged user.
+	 */
+	private function is_priveleged_user() {
+		$current_user = wp_get_current_user();
+
+		// Check if the current user is 'wds_admin'.
+		if ( ! is_wp_error( $current_user ) ) {
+			return ( $this->priveleged_user == $current_user->user_login );
+		}
+		return false;
 	}
 
 	/**
