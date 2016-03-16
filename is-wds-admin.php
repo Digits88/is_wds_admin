@@ -153,8 +153,7 @@ class Is_WDS_Admin {
 			case 'version':
 				return self::VERSION;
 			case 'basename':
-			case 'url':
-			case 'path':
+			case 'priveleged_user':
 				return $this->$field;
 			default:
 				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
