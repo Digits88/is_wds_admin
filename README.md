@@ -1,5 +1,5 @@
 # _`is_wds_admin`_ #
-[![Build Status](https://travis-ci.org/WebDevStudios/is_wds_admin.svg?branch=master)](https://travis-ci.org/WebDevStudios/is_wds_admin)
+[![Build Status](https://travis-ci.org/WebDevStudios/is_wds_admin.svg?branch=master)](https://travis-ci.org/WebDevStudios/is_wds_admin)  
 **Contributors:**      [WebDevStudios](https://github.com/WebDevStudios), [jazzsequence](https://github.com/jazzsequence)  
 **Stable tag:**        1.0.0  
 **License:**           GPLv2  
