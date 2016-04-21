@@ -54,12 +54,12 @@ class Is_WDS_Admin {
 	protected $basename = '';
 
 	/**
-	 * Priveleged username
+	 * privileged username
 	 *
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	protected $priveleged_user = '';
+	protected $privileged_user = '';
 
 	/**
 	 * Singleton instance of plugin
@@ -90,7 +90,7 @@ class Is_WDS_Admin {
 	 */
 	protected function __construct() {
 		$this->basename        = plugin_basename( __FILE__ );
-		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
+		$this->privileged_user = 'wds_admin'; // This can be whatever user is the privileged user.
 	}
 
 	/**
@@ -104,17 +104,17 @@ class Is_WDS_Admin {
 	}
 
 	/**
-	 * Check if the current user is the priveleged user.
+	 * Check if the current user is the privileged user.
 	 *
 	 * @since  1.0.0
-	 * @return bool True/false depending if the current user is the one defined in the __construct as the priveleged user.
+	 * @return bool True/false depending if the current user is the one defined in the __construct as the privileged user.
 	 */
-	private function is_priveleged_user() {
+	private function is_privileged_user() {
 		$current_user = wp_get_current_user();
 
 		// Check if the current user is 'wds_admin'.
 		if ( ! is_wp_error( $current_user ) ) {
-			return ( $this->priveleged_user == $current_user->user_login );
+			return ( $this->privileged_user == $current_user->user_login );
 		}
 		return false;
 	}
@@ -125,15 +125,15 @@ class Is_WDS_Admin {
 	 * @since 1.0.0
 	 */
 	public function add_cap_if_not_exists() {
-		// Check to see if the current user is defined as the priveleged user and if they don't already have the 'is_wds_admin' capability.
-		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() ) {
+		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
+		if ( $this->is_privileged_user() && ! $this->is_wds_admin() ) {
 			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
 			$user->add_cap( 'is_wds_admin' );             // Add the cap.
 		}
 	}
 
 	/**
-	 * Master checker if the current user has the priveleged capability.
+	 * Master checker if the current user has the privileged capability.
 	 * @return boolean
 	 */
 	public function is_wds_admin() {
@@ -153,7 +153,7 @@ class Is_WDS_Admin {
 			case 'version':
 				return self::VERSION;
 			case 'basename':
-			case 'priveleged_user':
+			case 'privileged_user':
 				return $this->$field;
 			default:
 				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
