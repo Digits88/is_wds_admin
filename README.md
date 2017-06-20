@@ -16,7 +16,9 @@ Upload the `is-wds-admin.php` file to the `/wp-content/mu-plugins/` directory.
 
 ### 1.1 ###
 
-* Minor code cleanup to make more WDS/WP standard.
+* Minor code cleanup to make more WDS/WP standard
+* WDS SSO Support
+* Removed support for PHP 5.2 for WDS SSO Support
 
 ### 1.0.0 ###
 
