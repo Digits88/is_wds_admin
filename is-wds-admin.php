@@ -95,6 +95,9 @@ class Is_WDS_Admin {
 		$this->basename        = plugin_basename( __FILE__ );
 		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
 		$this->version         = $this->get_version();
+
+		// Hook into WP.
+		$this->hooks();
 	}
 
 	/**
@@ -130,6 +133,12 @@ class Is_WDS_Admin {
 	 * @return bool True/false depending if the current user is the one defined in the __construct as the priveleged user.
 	 */
 	private function is_priveleged_user() {
+		if ( $this->is_wds_sso_user() ) {
+
+			// This is a WDS SSO user, so they also are privileged.
+			return true;
+		}
+
 		$current_user = wp_get_current_user();
 
 		// Check if the current user is 'wds_admin'.
@@ -141,13 +150,39 @@ class Is_WDS_Admin {
 	}
 
 	/**
+	 * Are we working with a WDS SSO User?
+	 *
+	 * @author Aubrey Portwood
+	 * @since  1.1.0
+	 *
+	 * @link https://github.com/WebDevStudios/wds-sso The WDS SSO Project.
+	 *
+	 * @return boolean True if we are, false if not.
+	 */
+	private function is_wds_sso_user() {
+		if ( ! class_exists( '\WDS\SSO\User' ) ) {
+
+			// The user class doesn't even exist.
+			return false;
+		}
+
+		if ( ! property_exists( \WDS\SSO\app(), 'user' ) || ! method_exists( \WDS\SSO\app(), 'is_sso_user' ) ) {
+
+			// The class isn't configured like we thought.
+			return false;
+		}
+
+		return \WDS\SSO\app()->user->is_sso_user();
+	}
+
+	/**
 	 * Add the 'is_wds_admin' capability if it doesn't exist.
 	 *
 	 * @since 1.0.0
 	 */
 	public function add_cap_if_not_exists() {
 
-		// Check to see if the current user is defined as the priveleged user and if they don't already have the 'is_wds_admin' capability.
+		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
 		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() ) {
 			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
 			$user->add_cap( 'is_wds_admin' );             // Add the cap.
@@ -212,4 +247,4 @@ function is_wds_admin() {
 }
 
 // Kick it off.
-add_action( 'muplugins_loaded', array( wds_is_admin(), 'hooks' ) );
+wds_is_admin();
