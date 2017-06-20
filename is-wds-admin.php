@@ -27,18 +27,19 @@
  */
 
 /**
- * Main initiation class
+ * Main initiation class.
  *
  * @since 1.0.0
- * @var   string $version  Plugin version
- * @var   string $basename Plugin basename
- * @var   string $url      Plugin URL
- * @var   string $path     Plugin Path
+ *
+ * @var   string $version  Plugin version.
+ * @var   string $basename Plugin basename.
+ * @var   string $url      Plugin URL.
+ * @var   string $path     Plugin Path.
  */
 class Is_WDS_Admin {
 
 	/**
-	 * Current version
+	 * Current version.
 	 *
 	 * @var    string
 	 * @since  1.0.0
@@ -46,7 +47,7 @@ class Is_WDS_Admin {
 	const VERSION = '1.0.0';
 
 	/**
-	 * Plugin basename
+	 * Plugin basename.
 	 *
 	 * @var    string
 	 * @since  1.0.0
@@ -54,7 +55,7 @@ class Is_WDS_Admin {
 	protected $basename = '';
 
 	/**
-	 * Priveleged username
+	 * Priveleged username.
 	 *
 	 * @var    string
 	 * @since  1.0.0
@@ -62,7 +63,7 @@ class Is_WDS_Admin {
 	protected $priveleged_user = '';
 
 	/**
-	 * Singleton instance of plugin
+	 * Singleton instance of plugin.
 	 *
 	 * @var    Is_WDS_Admin
 	 * @since  1.0.0
@@ -84,7 +85,7 @@ class Is_WDS_Admin {
 	}
 
 	/**
-	 * Sets up our plugin
+	 * Sets up our plugin.
 	 *
 	 * @since  1.0.0
 	 */
@@ -94,7 +95,7 @@ class Is_WDS_Admin {
 	}
 
 	/**
-	 * Add hooks and filters
+	 * Add hooks and filters.
 	 *
 	 * @since  1.0.0
 	 * @return void
@@ -114,8 +115,9 @@ class Is_WDS_Admin {
 
 		// Check if the current user is 'wds_admin'.
 		if ( ! is_wp_error( $current_user ) ) {
-			return ( $this->priveleged_user == $current_user->user_login );
+			return $this->priveleged_user === $current_user->user_login;
 		}
+
 		return false;
 	}
 
@@ -125,6 +127,7 @@ class Is_WDS_Admin {
 	 * @since 1.0.0
 	 */
 	public function add_cap_if_not_exists() {
+
 		// Check to see if the current user is defined as the priveleged user and if they don't already have the 'is_wds_admin' capability.
 		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() ) {
 			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
@@ -134,7 +137,10 @@ class Is_WDS_Admin {
 
 	/**
 	 * Master checker if the current user has the priveleged capability.
-	 * @return boolean
+	 *
+	 * @since  1.0.0
+	 *
+	 * @return boolean Can the current user is_wds_admin?
 	 */
 	public function is_wds_admin() {
 		return current_user_can( 'is_wds_admin' );
@@ -144,8 +150,10 @@ class Is_WDS_Admin {
 	 * Magic getter for our object.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @param  string $field Field to get.
 	 * @throws Exception Throws an exception if the field is invalid.
+	 *
 	 * @return mixed
 	 */
 	public function __get( $field ) {
@@ -156,14 +164,16 @@ class Is_WDS_Admin {
 			case 'priveleged_user':
 				return $this->$field;
 			default:
-				throw new Exception( 'Invalid '. __CLASS__ .' property: ' . $field );
+				// @codingStandardsIgnoreLine: The concatenation below is good.
+				throw new Exception( 'Invalid '. __CLASS__ . ' property: ' . $field );
 		}
 	}
 }
 
 /**
  * Grab the Is_WDS_Admin object and return it.
- * Wrapper for Is_WDS_Admin::get_instance()
+ *
+ * Wrapper for Is_WDS_Admin::get_instance().
  *
  * @since  1.0.0
  * @return Is_WDS_Admin  Singleton instance of plugin class.
@@ -174,7 +184,9 @@ function wds_is_admin() {
 
 /**
  * Checks if the current user is wds_admin and has special capabilities.
- * @return boolean
+ *
+ * @since  1.0.0
+ * @return boolean Is the user WDS Admin?
  */
 function is_wds_admin() {
 	return wds_is_admin()->is_wds_admin();
