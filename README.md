@@ -1,5 +1,7 @@
 # _`is_wds_admin`_ #
 
+-[![GitHub license](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://github.com/WebDevStudios/is_wds_admin/blob/master/LICENSE.md) [![Build Status](https://travis-ci.org/WebDevStudios/is_wds_admin.svg?branch=master)](https://travis-ci.org/WebDevStudios/is_wds_admin)
+
 **Contributors:** @WebDevStudios, @jazzsequence, @bradp, @aubreypwd
 **License:** GPLv2
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
