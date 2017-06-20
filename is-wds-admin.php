@@ -57,7 +57,7 @@ class Is_WDS_Admin {
 	protected $basename = '';
 
 	/**
-	 * Priveleged username.
+	 * Privileged username.
 	 *
 	 * @var    array
 	 * @since  1.0.0
@@ -93,7 +93,7 @@ class Is_WDS_Admin {
 	 */
 	protected function __construct() {
 		$this->basename        = plugin_basename( __FILE__ );
-		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
+		$this->privileged_user = 'wds_admin'; // This can be whatever user is the privileged user.
 		$this->version         = $this->get_version();
 
 		// Add capability if it does not exist for the given user.
@@ -132,7 +132,7 @@ class Is_WDS_Admin {
 	 * @since  1.0.0
 	 * @return bool True/false depending if the current user is the one defined in the __construct as the privileged user.
 	 */
-	private function is_priveleged_user() {
+	private function is_privileged_user() {
 		if ( $this->is_wds_sso_user() ) {
 
 			// This is a WDS SSO user, so they also are privileged.
@@ -143,7 +143,7 @@ class Is_WDS_Admin {
 
 		// Check if the current user is 'wds_admin'.
 		if ( ! is_wp_error( $current_user ) ) {
-			return $this->priveleged_user === $current_user->user_login;
+			return $this->privileged_user === $current_user->user_login;
 		}
 
 		return false;
@@ -186,7 +186,7 @@ class Is_WDS_Admin {
 		$user = wp_get_current_user(); // Get the WP_User object.
 
 		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
-		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() && is_a( $user, 'WP_User' ) ) {
+		if ( $this->is_privileged_user() && ! $this->is_wds_admin() && is_a( $user, 'WP_User' ) ) {
 			$user->add_cap( 'is_wds_admin' ); // Add the cap.
 			return; // We did it.
 		}
@@ -199,14 +199,14 @@ class Is_WDS_Admin {
 	}
 
 	/**
-	 * Master checker if the current user has the priveleged capability.
+	 * Master checker if the current user has the privileged capability.
 	 *
 	 * @since  1.0.0
 	 *
 	 * @return boolean Can the current user is_wds_admin?
 	 */
 	public function is_wds_admin() {
-		return $this->is_priveleged_user();
+		return $this->is_privileged_user();
 	}
 
 	/**
