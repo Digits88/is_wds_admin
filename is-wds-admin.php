@@ -2,7 +2,7 @@
 /**
  * Plugin Name: is_wds_admin
  * Description: Adds a custom capability and some helper functions to determine if the current user is a privileged WDS user. NOT TO BE INSTALLED AS A NORMAL PLUGIN.
- * Version:     1.0.0
+ * Version:     1.1
  * Author:      WebDevStudios
  * Author URI:  http://webdevstudios.com
  * License:     GPLv2
