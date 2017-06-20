@@ -41,10 +41,12 @@ class Is_WDS_Admin {
 	/**
 	 * Current version.
 	 *
+	 * Always is set to what is in the plugin header.
+	 *
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	private $version = '1.0.0';
+	private $version = '';
 
 	/**
 	 * Plugin basename.
@@ -92,6 +94,23 @@ class Is_WDS_Admin {
 	protected function __construct() {
 		$this->basename        = plugin_basename( __FILE__ );
 		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
+		$this->version         = $this->get_version();
+	}
+
+	/**
+	 * Get the version of this plugin.
+	 *
+	 * @author Aubrey Portwood
+	 * @since 1.0.0
+	 *
+	 * @return string The Version value in the header.
+	 */
+	private function get_version() {
+		$headers = (object) get_file_data( __FILE__, array(
+			'version' => 'Version',
+		) );
+
+		return $headers->version;
 	}
 
 	/**
