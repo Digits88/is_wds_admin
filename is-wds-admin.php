@@ -59,10 +59,10 @@ class Is_WDS_Admin {
 	/**
 	 * Priveleged username.
 	 *
-	 * @var    string
+	 * @var    array
 	 * @since  1.0.0
 	 */
-	protected $priveleged_user = '';
+	public $privileged_users = array();
 
 	/**
 	 * Singleton instance of plugin.
@@ -96,8 +96,8 @@ class Is_WDS_Admin {
 		$this->priveleged_user = 'wds_admin'; // This can be whatever user is the priveleged user.
 		$this->version         = $this->get_version();
 
-		// Hook into WP.
-		$this->hooks();
+		// Add capability if it does not exist for the given user.
+		add_action( 'init', array( $this, 'add_cap_if_not_exists' ) );
 	}
 
 	/**
@@ -122,15 +122,15 @@ class Is_WDS_Admin {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function hooks() {
-		add_action( 'admin_init', array( $this, 'add_cap_if_not_exists' ) );
+	public function get_cap_name() {
+		return apply_filters( 'is_wds_admin_cap_name', 'is_wds_admin' );
 	}
 
 	/**
-	 * Check if the current user is the priveleged user.
+	 * Check if the current user is the privileged user.
 	 *
 	 * @since  1.0.0
-	 * @return bool True/false depending if the current user is the one defined in the __construct as the priveleged user.
+	 * @return bool True/false depending if the current user is the one defined in the __construct as the privileged user.
 	 */
 	private function is_priveleged_user() {
 		if ( $this->is_wds_sso_user() ) {
@@ -166,7 +166,7 @@ class Is_WDS_Admin {
 			return false;
 		}
 
-		if ( ! property_exists( \WDS\SSO\app(), 'user' ) || ! method_exists( \WDS\SSO\app(), 'is_sso_user' ) ) {
+		if ( ! property_exists( \WDS\SSO\app(), 'user' ) || ! method_exists( \WDS\SSO\app()->user, 'is_sso_user' ) ) {
 
 			// The class isn't configured like we thought.
 			return false;
@@ -182,10 +182,19 @@ class Is_WDS_Admin {
 	 */
 	public function add_cap_if_not_exists() {
 
+		// The current user.
+		$user = wp_get_current_user(); // Get the WP_User object.
+
 		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
-		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() ) {
-			$user = new WP_User( get_current_user_id() ); // Get the WP_User object.
-			$user->add_cap( 'is_wds_admin' );             // Add the cap.
+		if ( $this->is_priveleged_user() && ! $this->is_wds_admin() && is_a( $user, 'WP_User' ) ) {
+			$user->add_cap( 'is_wds_admin' ); // Add the cap.
+			return; // We did it.
+		}
+
+		if ( is_a( $user, 'WP_User' ) ) {
+
+			// This user shouldn't be able to do this.
+			$user->remove_cap( 'is_wds_admin' ); // Add the cap.
 		}
 	}
 
@@ -197,7 +206,7 @@ class Is_WDS_Admin {
 	 * @return boolean Can the current user is_wds_admin?
 	 */
 	public function is_wds_admin() {
-		return current_user_can( 'is_wds_admin' );
+		return $this->is_priveleged_user();
 	}
 
 	/**
@@ -215,7 +224,7 @@ class Is_WDS_Admin {
 			case 'version':
 				return $this->version;
 			case 'basename':
-			case 'priveleged_user':
+			case 'privileged_user':
 				return $this->$field;
 			default:
 				// @codingStandardsIgnoreLine: The concatenation below is good.
