@@ -194,7 +194,7 @@ class Is_WDS_Admin {
 		if ( is_a( $user, 'WP_User' ) ) {
 
 			// This user shouldn't be able to do this.
-			$user->remove_cap( 'is_wds_admin' ); // Add the cap.
+			$user->remove_cap( 'is_wds_admin' ); // Remove the cap.
 		}
 	}
 
