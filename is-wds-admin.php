@@ -44,7 +44,7 @@ class Is_WDS_Admin {
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	const VERSION = '1.0.0';
+	private $version = '1.0.0';
 
 	/**
 	 * Plugin basename.
@@ -159,7 +159,7 @@ class Is_WDS_Admin {
 	public function __get( $field ) {
 		switch ( $field ) {
 			case 'version':
-				return self::VERSION;
+				return $this->version;
 			case 'basename':
 			case 'priveleged_user':
 				return $this->$field;
