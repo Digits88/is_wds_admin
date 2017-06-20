@@ -1,8 +1,8 @@
 # _`is_wds_admin`_ #
-**Contributors:**      WebDevStudios, jazzsequence  
-**Stable tag:**        1.0.0  
-**License:**           GPLv2  
-**License URI:**       http://www.gnu.org/licenses/gpl-2.0.html
+
+**Contributors:** @WebDevStudios, @jazzsequence, @bradp, @aubreypwd
+**License:** GPLv2
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
 ## Description ##
 
@@ -14,5 +14,10 @@ Upload the `is-wds-admin.php` file to the `/wp-content/mu-plugins/` directory.
 
 ## Changelog ##
 
+### 1.1 ###
+
+* Minor code cleanup to make more WDS/WP standard.
+
 ### 1.0.0 ###
+
 * First release
