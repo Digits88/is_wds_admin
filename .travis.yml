@@ -31,6 +31,7 @@ matrix:
 
     allow_failures:
         - php: 'hhvm'
+        - php: '5.2'
 
 # Use this to prepare the system to install prerequisites or dependencies.
 # e.g. sudo apt-get update.

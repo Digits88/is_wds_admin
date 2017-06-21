@@ -2,7 +2,7 @@
 /**
  * Plugin Name: is_wds_admin
  * Description: Adds a custom capability and some helper functions to determine if the current user is a privileged WDS user. NOT TO BE INSTALLED AS A NORMAL PLUGIN.
- * Version:     1.0.0
+ * Version:     1.1
  * Author:      WebDevStudios
  * Author URI:  http://webdevstudios.com
  * License:     GPLv2
@@ -27,26 +27,29 @@
  */
 
 /**
- * Main initiation class
+ * Main initiation class.
  *
  * @since 1.0.0
- * @var   string $version  Plugin version
- * @var   string $basename Plugin basename
- * @var   string $url      Plugin URL
- * @var   string $path     Plugin Path
+ *
+ * @var   string $version  Plugin version.
+ * @var   string $basename Plugin basename.
+ * @var   string $url      Plugin URL.
+ * @var   string $path     Plugin Path.
  */
 class Is_WDS_Admin {
 
 	/**
-	 * Current version
+	 * Current version.
+	 *
+	 * Always is set to what is in the plugin header.
 	 *
 	 * @var    string
 	 * @since  1.0.0
 	 */
-	const VERSION = '1.0.0';
+	private $version = '';
 
 	/**
-	 * Plugin basename
+	 * Plugin basename.
 	 *
 	 * @var    string
 	 * @since  1.0.0
@@ -54,7 +57,7 @@ class Is_WDS_Admin {
 	protected $basename = '';
 
 	/**
-	 * Privileged username
+	 * Privileged username.
 	 *
 	 * @var    array
 	 * @since  1.0.0
@@ -62,7 +65,7 @@ class Is_WDS_Admin {
 	public $privileged_users = array();
 
 	/**
-	 * Singleton instance of plugin
+	 * Singleton instance of plugin.
 	 *
 	 * @var    Is_WDS_Admin
 	 * @since  1.0.0
@@ -73,6 +76,7 @@ class Is_WDS_Admin {
 	 * Creates or returns an instance of this class.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @return Is_WDS_Admin A single instance of this class.
 	 */
 	public static function get_instance() {
@@ -84,20 +88,41 @@ class Is_WDS_Admin {
 	}
 
 	/**
-	 * Sets up our plugin
+	 * Sets up our plugin.
 	 *
 	 * @since  1.0.0
 	 */
 	protected function __construct() {
 		$this->basename        = plugin_basename( __FILE__ );
+		$this->privileged_user = 'wds_admin'; // This can be whatever user is the privileged user.
+		$this->version         = $this->get_version();
 
-		// This can be whatever user is the privileged user.
-		$this->privileged_users = array( 'wds_admin' );
+		// Add capability if it does not exist for the given user.
+		add_action( 'init', array( $this, 'add_cap_if_not_exists' ) );
 	}
 
 	/**
-	 * Simply return our capability name, while allowing it to be filtered.
-	 * @return string capability name
+	 * Get the version of this plugin.
+	 *
+	 * @author Aubrey Portwood
+	 * @since 1.0.0
+	 *
+	 * @return string The Version value in the header.
+	 */
+	private function get_version() {
+		$headers = (object) get_file_data( __FILE__, array(
+			'version' => 'Version',
+		) );
+
+		return $headers->version;
+	}
+
+	/**
+	 * Add hooks and filters.
+	 *
+	 * @since  1.0.0
+	 *
+	 * @return mixed The result of the is_wds_admin_cap_name filter.
 	 */
 	public function get_cap_name() {
 		return apply_filters( 'is_wds_admin_cap_name', 'is_wds_admin' );
@@ -107,107 +132,81 @@ class Is_WDS_Admin {
 	 * Check if the current user is the privileged user.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @return bool True/false depending if the current user is the one defined in the __construct as the privileged user.
 	 */
 	private function is_privileged_user() {
+		if ( $this->is_wds_sso_user() ) {
 
-		// Allow for overriding of the entire check. This filter also runs at the end
-		// of the function, but at that point contains our current_user object, so
-		// more checking can be done.
-		if ( apply_filters( 'is_wds_admin', false ) ) {
+			// This is a WDS SSO user, so they also are privileged.
 			return true;
 		}
 
-		$current_user = null;
+		$current_user = wp_get_current_user();
 
-		// If is_wds_admin() gets called to early, wp_get_current_user may not exist yet.
-		// Rather than fatal erroing, we'll just skip the check and keep the $current_user
-		// variable set to null, so it can still get passed into the comparision checks.
-		if ( function_exists( 'wp_get_current_user' ) ) {
-			$current_user = wp_get_current_user();
+		// Check if the current user is 'wds_admin'.
+		if ( ! is_wp_error( $current_user ) ) {
+			return $this->privileged_user === $current_user->user_login;
 		}
 
-		// If we don't have a current user, then they can't be a wds_admin.
-		if ( is_wp_error( $current_user ) ) {
+		return false;
+	}
+
+	/**
+	 * Are we working with a WDS SSO User?
+	 *
+	 * @author Aubrey Portwood
+	 * @since  1.1.0
+	 *
+	 * @link https://github.com/WebDevStudios/wds-sso The WDS SSO Project.
+	 *
+	 * @return boolean True if we are, false if not.
+	 */
+	private function is_wds_sso_user() {
+		if ( ! class_exists( '\WDS\SSO\User' ) ) {
+
+			// The user class doesn't even exist.
 			return false;
 		}
 
-		// If we have a user_login for the current user object, compare that to our acceptable user array.
-		if ( is_object( $current_user ) && isset( $current_user->user_login ) ) {
+		if ( ! property_exists( \WDS\SSO\app(), 'user' ) || ! method_exists( \WDS\SSO\app()->user, 'is_sso_user' ) ) {
 
-			// Allow our allowed users to be filtered.
-			$allowed_users = apply_filters( 'wds_is_admin_allowed_usernames', $this->privileged_users );
-
-			// Check to see if the current user is in the allowed users array.
-			if ( is_array( $allowed_users ) && in_array( $current_user->user_login, $allowed_users ) ) {
-				return true;
-			}
-
-			// If for some reason the allowed users get filtered to be a string, might as well check that too.
-			if ( is_string( $allowed_users ) && ( $current_user->user_login == $allowed_users ) ) {
-				return true;
-			}
+			// The class isn't configured like we thought.
+			return false;
 		}
 
-		// Also allow for filtering globally,
-		return apply_filters( 'is_wds_admin', false, $current_user );
+		return \WDS\SSO\app()->user->is_sso_user();
 	}
 
 	/**
-	 * Add the 'is_wds_admin' capability if it doesn't exist. Remove if the user should not have it.
+	 * Add the 'is_wds_admin' capability if it doesn't exist.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return  void Early exit if we add the cap, so we don't also remove it.
 	 */
 	public function add_cap_if_not_exists() {
 
-		// Check to see if the user is privileged
-		$is_priviledged = $this->is_privileged_user();
+		// The current user.
+		$user = wp_get_current_user(); // Get the WP_User object.
 
-		// Check to see if the user currently has the is_wds_admin cap.
-		$has_cap = current_user_can( $this->get_cap_name() );
+		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
+		if ( $this->is_privileged_user() && ! $this->is_wds_admin() && $user instanceof WP_User ) {
+			$user->add_cap( 'is_wds_admin' ); // Add the cap.
 
-		// Check to see if the current user is defined as the privileged user and
-		// if they don't already have the 'is_wds_admin' capability.
-		if ( $is_priviledged && ! $has_cap ) {
-			// Add the cap to the user
-			return $this->modify_cap( 'add' );
-		}
+		} elseif ( $user instanceof WP_User ) {
 
-		// If the user is not privileged, but has the capability, let's remove it from them.
-		if ( ! $is_priviledged && $has_cap ) {
-			// Remove cap from user.
-			return $this->modify_cap( 'remove' );
+			// This user shouldn't be able to do this.
+			$user->remove_cap( 'is_wds_admin' ); // Remove the cap.
 		}
 	}
 
 	/**
-	 * Helper method to add or remove 'is_wds_admin' capabity for current user.
-	 * @param  string $action 'add' or 'remove'
-	 */
-	public function modify_cap( $action ) {
-
-		// Get the WP_User object.
-		$user = new WP_User( get_current_user_id() );
-
-		// If we didn't get a user, bail out.
-		if ( empty( $user ) || ! is_object( $user ) ) {
-			return;
-		}
-
-		// Depening on the action that is being passed in, add or remove the capability for the user.
-		switch ( $action ) {
-			case 'add':
-				$user->add_cap( $this->get_cap_name() );
-				break;
-			case 'remove':
-				$user->remove_cap( $this->get_cap_name() );
-				break;
-		}
-	}
-
-	/**
-	 * Master checker if the current user is privileged.
-	 * @return boolean
+	 * Master checker if the current user has the privileged capability.
+	 *
+	 * @since  1.0.0
+	 *
+	 * @return boolean Can the current user is_wds_admin?
 	 */
 	public function is_wds_admin() {
 		return $this->is_privileged_user();
@@ -217,28 +216,33 @@ class Is_WDS_Admin {
 	 * Magic getter for our object.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @param  string $field Field to get.
 	 * @throws Exception Throws an exception if the field is invalid.
-	 * @return mixed
+	 *
+	 * @return mixed The value of the thing requested.
 	 */
 	public function __get( $field ) {
 		switch ( $field ) {
 			case 'version':
-				return self::VERSION;
+				return $this->version;
 			case 'basename':
 			case 'privileged_user':
 				return $this->$field;
 			default:
-				throw new Exception( 'Invalid ' . __CLASS__ . ' property: ' . $field );
+				// @codingStandardsIgnoreLine: The concatenation below is good.
+				throw new Exception( 'Invalid '. __CLASS__ . ' property: ' . $field );
 		}
 	}
 }
 
 /**
  * Grab the Is_WDS_Admin object and return it.
- * Wrapper for Is_WDS_Admin::get_instance()
+ *
+ * Wrapper for Is_WDS_Admin::get_instance().
  *
  * @since  1.0.0
+ *
  * @return Is_WDS_Admin  Singleton instance of plugin class.
  */
 function wds_is_admin() {
@@ -247,11 +251,14 @@ function wds_is_admin() {
 
 /**
  * Checks if the current user is wds_admin and has special capabilities.
- * @return boolean
+ *
+ * @since  1.0.0
+ *
+ * @return boolean Is the user WDS Admin?
  */
 function is_wds_admin() {
 	return wds_is_admin()->is_wds_admin();
 }
 
 // Kick it off.
-add_action( 'admin_init', array( wds_is_admin(), 'add_cap_if_not_exists' ) );
+wds_is_admin();
