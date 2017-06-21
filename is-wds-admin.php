@@ -76,6 +76,7 @@ class Is_WDS_Admin {
 	 * Creates or returns an instance of this class.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @return Is_WDS_Admin A single instance of this class.
 	 */
 	public static function get_instance() {
@@ -120,7 +121,8 @@ class Is_WDS_Admin {
 	 * Add hooks and filters.
 	 *
 	 * @since  1.0.0
-	 * @return void
+	 *
+	 * @return mixed The result of the is_wds_admin_cap_name filter.
 	 */
 	public function get_cap_name() {
 		return apply_filters( 'is_wds_admin_cap_name', 'is_wds_admin' );
@@ -130,6 +132,7 @@ class Is_WDS_Admin {
 	 * Check if the current user is the privileged user.
 	 *
 	 * @since  1.0.0
+	 *
 	 * @return bool True/false depending if the current user is the one defined in the __construct as the privileged user.
 	 */
 	private function is_privileged_user() {
@@ -179,6 +182,8 @@ class Is_WDS_Admin {
 	 * Add the 'is_wds_admin' capability if it doesn't exist.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return  void Early exit if we add the cap, so we don't also remove it.
 	 */
 	public function add_cap_if_not_exists() {
 
@@ -217,7 +222,7 @@ class Is_WDS_Admin {
 	 * @param  string $field Field to get.
 	 * @throws Exception Throws an exception if the field is invalid.
 	 *
-	 * @return mixed
+	 * @return mixed The value of the thing requested.
 	 */
 	public function __get( $field ) {
 		switch ( $field ) {
@@ -239,6 +244,7 @@ class Is_WDS_Admin {
  * Wrapper for Is_WDS_Admin::get_instance().
  *
  * @since  1.0.0
+ *
  * @return Is_WDS_Admin  Singleton instance of plugin class.
  */
 function wds_is_admin() {
@@ -249,6 +255,7 @@ function wds_is_admin() {
  * Checks if the current user is wds_admin and has special capabilities.
  *
  * @since  1.0.0
+ *
  * @return boolean Is the user WDS Admin?
  */
 function is_wds_admin() {
