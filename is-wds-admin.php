@@ -191,12 +191,10 @@ class Is_WDS_Admin {
 		$user = wp_get_current_user(); // Get the WP_User object.
 
 		// Check to see if the current user is defined as the privileged user and if they don't already have the 'is_wds_admin' capability.
-		if ( $this->is_privileged_user() && ! $this->is_wds_admin() && is_a( $user, 'WP_User' ) ) {
+		if ( $this->is_privileged_user() && ! $this->is_wds_admin() && $user instanceof WP_User ) {
 			$user->add_cap( 'is_wds_admin' ); // Add the cap.
-			return; // We did it.
-		}
 
-		if ( is_a( $user, 'WP_User' ) ) {
+		} elseif ( $user instanceof WP_User ) {
 
 			// This user shouldn't be able to do this.
 			$user->remove_cap( 'is_wds_admin' ); // Remove the cap.
